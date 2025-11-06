@@ -168,7 +168,7 @@ body { font-family: Arial, sans-serif }
 }
 .start-btn {
   padding: 0.5rem 1rem;
-  background: #4CAF50;
+  background: #9f77d3;
   color: white;
   border: none;
   border-radius: 4px;
@@ -204,14 +204,47 @@ body { font-family: Arial, sans-serif }
   margin: 0 0 0.5rem 0;
 }
 .logs {
+  color: rgba(141, 31, 117, 1);
   flex: 1 1 auto;
   overflow: auto;
-  background: #fafafa;
+  background: rgb(255, 255, 255,0.65);
   border: 1px solid #eee;
   padding: 0.5rem;
   font-family: Consolas, "Courier New", monospace;
   font-size: 12px;
 }
 .log-line { margin-bottom: 4px; }
+</style>
+
+<style>
+body {
+  margin: 50px ;
+  min-height: 100vh;
+  background: url('/bg1.jpg') center/cover fixed no-repeat;
+}
+.container {
+  position: relative;
+  color: #fafafa;
+  backdrop-filter: blur(3px);
+  background: rgba(151, 42, 85, 0.36);
+  border-radius: 18px;
+  padding: 2rem;
+  overflow: hidden;  /* 选配：让遮罩圆角一致 */
+}
+
+.container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.48), rgba(0, 0, 0, 0.15));
+  pointer-events: none;
+  z-index: 0;
+}
+
+.container > * {
+  position: relative;
+  z-index: 1;
+}
 </style>
 

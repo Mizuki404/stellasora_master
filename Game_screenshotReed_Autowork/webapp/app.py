@@ -31,6 +31,7 @@ startgame_tool = StartGame()
 dailytasks_tool = Dailytasks()
 
 
+
 def img_to_datauri(img):
     # img: OpenCV BGR numpy array
     _, buf = cv2.imencode('.png', img)
