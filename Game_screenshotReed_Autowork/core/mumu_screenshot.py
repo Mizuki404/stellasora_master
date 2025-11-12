@@ -4,27 +4,35 @@ import numpy as np
 import os
 from pathlib import Path
 
+from .config import get_adb_path, get_default_instance, resolve_path
+
 class MumuScreenshot:
-    def __init__(self, adb_path=None, default_instance=1):
-        self.adb_path = str(Path(adb_path or r"D:\Program Files\Netease\MuMu Player 12\shell\adb.exe"))
-        self.default_instance = default_instance
-        
-        if not os.path.exists(self.adb_path):
-            raise FileNotFoundError(f"未找到ADB工具，请检查路径: {self.adb_path}")
+    def __init__(self, adb_path=None, default_instance=None):
+        self._adb_override = resolve_path(adb_path) if adb_path else None
+        self._default_instance_override = default_instance
 
     def capture(self, instance_num=None, save_path=None):
-        port = 7554 + (instance_num or self.default_instance)
+        adb_path = self._adb_override or get_adb_path(raise_on_missing=False)
+        if adb_path is None:
+            raise RuntimeError("ADB 路径未配置，请在设置页面填写 adb_path 后重试")
+        if not adb_path.exists():
+            raise RuntimeError(f"指定的 ADB 工具不存在: {adb_path}")
+
+        port_base = self._default_instance_override
+        if port_base is None:
+            port_base = get_default_instance()
+        port = 7554 + (instance_num if instance_num is not None else port_base)
         
         try:
             subprocess.run(
-                f'"{self.adb_path}" connect 127.0.0.1:{port}',
+                f'"{adb_path}" connect 127.0.0.1:{port}',
                 shell=True,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE
             )
             
             result = subprocess.run(
-                f'"{self.adb_path}" -s 127.0.0.1:{port} exec-out screencap -p',
+                f'"{adb_path}" -s 127.0.0.1:{port} exec-out screencap -p',
                 shell=True,
                 capture_output=True,
                 check=True
@@ -45,9 +53,9 @@ class MumuScreenshot:
             return img
             
         except subprocess.CalledProcessError as e:
-            error_msg = e.stderr.decode('gbk', errors='ignore') or e.stdout.decode('gbk', errors='ignore')
+            stderr = e.stderr.decode('gbk', errors='ignore') if e.stderr else ''
+            stdout = e.stdout.decode('gbk', errors='ignore') if e.stdout else ''
+            error_msg = stderr or stdout or str(e)
             raise RuntimeError(f"ADB命令执行失败: {error_msg}") from e
         except Exception as e:
             raise RuntimeError(f"截图过程中发生错误: {str(e)}") from e
-
-default_screenshot = MumuScreenshot()

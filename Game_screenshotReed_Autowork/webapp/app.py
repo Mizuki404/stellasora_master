@@ -13,7 +13,8 @@ PROJECT_ROOT = BASE_DIR.parent
 # Ensure project root is on sys.path so `import core` works when launching from webapp/
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from core import MumuScreenshot, Tapscreen, Autorecruitment, StartGame, IconDetector,Dailytasks
+from core import MumuScreenshot, Tapscreen, Autorecruitment, StartGame, IconDetector, Dailytasks
+from core.config import get_config, update_config
 
 app = Flask(__name__, static_folder=str(BASE_DIR / 'static'), static_url_path='', template_folder=str(BASE_DIR / 'templates'))
 
@@ -133,6 +134,25 @@ def start_dailytasks():
         return jsonify({'ok': False, 'error': str(e)})
 
 
+@app.route('/config', methods=['GET', 'POST'])
+def config_endpoint():
+    """Expose configuration for frontend settings page."""
+    try:
+        if request.method == 'GET':
+            return jsonify({'ok': True, 'config': get_config()})
+
+        payload = request.get_json(silent=True) or {}
+        if not isinstance(payload, dict):
+            return jsonify({'ok': False, 'error': '请求体格式错误，应为 JSON 对象'}), 400
+
+        updated = update_config(payload)
+        return jsonify({'ok': True, 'config': updated})
+    except Exception as exc:
+        logger.exception('配置接口处理失败')
+        return jsonify({'ok': False, 'error': str(exc)}), 500
+
+
 if __name__ == '__main__':
     # Run on localhost:5000
     app.run(host='127.0.0.1', port=5000, debug=True, threaded=True)
+

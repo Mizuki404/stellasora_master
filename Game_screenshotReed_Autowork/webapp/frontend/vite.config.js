@@ -15,7 +15,8 @@ export default defineConfig({
       '/start_game': 'http://127.0.0.1:5000',
       '/auto_recruit': 'http://127.0.0.1:5000',
       '/dailytasks': 'http://127.0.0.1:5000',
-      '/logs': 'http://127.0.0.1:5000'
+      '/logs': 'http://127.0.0.1:5000',
+      '/config': 'http://127.0.0.1:5000'
     }
   },
   build: {
